@@ -31,7 +31,7 @@
             $item["price"] = $article->find("span.customValue .mainValue")[0]->innertext();
         }
 
-        insertData("busca", $item["title"], $item["img"], $item["price"]);
+        insertData("buscapé", $item["title"], $item["img"], $item["price"]);
 
         $articles .= '<div class="product">
                             <img src="' . $item["img"] . '" alt="">
@@ -50,6 +50,7 @@
 
     function insertData($web,  $titulo, $img, $preco)
     {
+        // Setup database
         $servername = "localhost";
         $database = "e-commerce";
         $username = "root";
@@ -57,15 +58,21 @@
 
         try {
 
+            // Connect database
             $conn = new PDO("mysql:host=$servername;dbname=$database", $username, $password);
+
+            // Setup database Attributes
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+            // Verify if the product already exists
             $stmt = $conn->prepare("SELECT * FROM product WHERE titulo = '{$titulo}' AND preco = '{$preco}'");
             $stmt->execute();
 
 
             if ($stmt->rowCount() > 0)
                 return true;
+
+            // Save if doesn't exists
 
             $stmt = $conn->prepare("INSERT INTO product (web, titulo, img, preco) VALUES (:web, :titulo, :img, :preco)");
             $stmt->bindParam(':web', $web);
@@ -79,5 +86,4 @@
         } catch (PDOException $e) {
             return false;
         }
-        $conn = null;
     }
